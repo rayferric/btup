@@ -348,6 +348,14 @@ int main(int argc, char **argv) {
 		if (config::init(argc, argv))
 			return 0;
 
+		// Init LibTorrent session settings
+		{
+			lt::settings_pack settings;
+			settings.set_bool(lt::settings_pack::anonymous_mode, true);
+			settings.set_int(lt::settings_pack::max_metadata_size, 1024 * 1024 * 1240);
+			session.apply_settings(settings);
+		}
+
 		// Load statistics from previous sessions if they exist
 		stats::try_load();
 
