@@ -103,7 +103,9 @@
 		"complex": "cpp",
 		"coroutine": "cpp",
 		"source_location": "cpp",
-		"*.ipp": "cpp"
+		"*.ipp": "cpp",
+		"charconv": "cpp",
+		"hash_map": "cpp"
 	},
 	"cmake.debugConfig": {
 		"cwd": "${workspaceFolder}"

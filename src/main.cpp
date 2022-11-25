@@ -16,6 +16,15 @@ uint64_t last_update_time = 0; // Forces update on the first iteration of the ma
 std::vector<std::unique_ptr<torrent_userdata>> recounting_torrents;
 std::vector<std::unique_ptr<torrent_userdata>> seeding_torrents;
 
+std::shared_ptr<lt::torrent_info> create_torrent_info(const std::string &path) {
+	return std::make_shared<lt::torrent_info>(
+		path,
+		lt::load_torrent_limits{
+			.max_buffer_size  = 100000000
+		}
+	);
+}
+
 void discover_new_torrents_and_unregister_deleted_ones() {
 	if (config::verbose())
 		std::cout << "Discovering new torrents." << std::endl;
@@ -144,7 +153,7 @@ void manage_torrent_seeding(const std::vector<std::string> &torrent_names, std::
 			}
 		}
 
-		auto torrent_info = std::make_shared<lt::torrent_info>(torrent_path.string());
+		auto torrent_info = create_torrent_info(torrent_path.string());
 		uint64_t data_size = torrent_info->total_size();
 
 		// Attempt to purge less important torrent data if the size of this torrent would make the data directory too large
@@ -260,7 +269,7 @@ void start_recounting_seeders() {
 
 			lt::add_torrent_params params;
 			params.save_path = (config::tmp_dir() / name).string();
-			params.ti = std::make_shared<lt::torrent_info>(torrent_path.string());
+			params.ti = create_torrent_info(torrent_path.string());
 			params.userdata = recounting_torrents.back().get();
 			params.download_limit = 100 * 1024 * 1024; // Limit download to 100 KiB/s
 
@@ -352,7 +361,6 @@ int main(int argc, char **argv) {
 		{
 			lt::settings_pack settings;
 			settings.set_bool(lt::settings_pack::anonymous_mode, true);
-			settings.set_int(lt::settings_pack::max_metadata_size, 1024 * 1024 * 1240);
 			session.apply_settings(settings);
 		}
 
